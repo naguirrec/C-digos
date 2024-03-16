@@ -1,0 +1,211 @@
+# Práctica 1
+
+Esta práctica es una continuación directa del Laboratorio 1 y se utilizará el mismo proyecto. En el último paso del laboratorio se implementaron los métodos `mayorTablero()` y `getTablerosConPuntuacionMinima(int puntuacion)`. De la teoría de la asignatura se sabe que este tipo de operaciones pueden realizarse de una manera mucho más eficiente si se trabaja con una colección ordenada. En esta práctica se seguirá esta idea para mejorar el rendimiento de los métodos de la clase `GestorTableros`.
+
+**Nota**: Java cuenta con una clase `Collections` que tiene métodos para ordenar listas. Sin embargo, es recomendable que en este punto del curso se implemente algún método de ordenación manualmente para entender bien cómo funciona. Las transparencias de la asignatura tienen ejemplos de cómo implementar los diferentes algoritmos de ordenación que se contemplan en la asignatura.
+
+## Paso 1: Ordenar tableros
+
+En este paso se modificará la clase `GestorTableros` de forma que las búsquedas que se realicen se hagan siempre sobre una lista ordenada. Para ello, hay dos opciones: o bien se ordena la lista en cuanto se crea o bien se ordena la primera vez que se realiza una operación de búsqueda. Cualquiera de las dos opciones es igual de válida y ambas harán uso de un método que ordene la lista. Este método se llamará `ordenarTableros`. Este método debe aplicar alguno de los algoritmos de ordenación que se han visto en la asignatura, idealmente uno que tenga complejidad $O(n log (n))$. 
+
+### Pruebas recomendadas
+
+Para probar que la ordenación es correcta, se puede utilizar el método `sorted` que aparece en las transparencias de la asignatura. Este método recorre el array y comprueba que ninguna pareja de elementos consecutivos está desordenada.
+
+## Paso 2: Actualizar los métodos existentes
+
+Finalmente, se deben actualizar los métodos `mayorTablero` y `getTablerosConPuntuacionMinima` para que hagan uso de la lista ordenada.
+
+### `mayorTablero`
+
+Sabiendo que la lista está ordenada, el tablero con la mayor puntuación será el último tablero de la lista (o el primero si se ha ordenado de mayor a menor). Por lo tanto, el método `mayorTablero` deberá devolver el último tablero de la lista.
+
+### `getTablerosConPuntuacionMinima`
+
+Este método deberá encontrar el índice del primer tablero con una puntuación mayor o igual a la puntuación que se pasa como parámetro. Sabiendo ese indice, el método tiene devolver una sublista que contenga todos los tableros a partir de esa posición.
+
+### Pruebas recomendadas
+
+Es posible utilizar la misma batería de pruebas que en el laboratorio 1 para probar que los métodos `mayorTablero` y `getTablerosConPuntuacionMinima` siguen funcionando correctamente. Sin embargo, es interesante comprobar la mejora de rendimiento que se ha conseguido al trabajar con una lista ordenada. Al ejecutar un test de JUnit es posible comprobar el tiempo que ha tardado en ejecutarse. Se puede comparar el tiempo que tarda en ejecutarse el test con la búsqueda en una colección ordenada con el tiempo que tarda en ejecutarse el test con la búsqueda secuencial en una colección desordenada. Para que esta comparación sea significativa, el método de test deberá ejecutar varias búsquedas.
+
+![Comparación de tiempos](data/TestJUnit.png)
+
+## Paso 3: Puntuación mediana
+
+Como paso final, se propone implementar un método `getPuntuacionMediana` que devuelva cual es la mediana de la puntuación de los tableros. La mediana es el valor que ocupa la posición central de un conjunto de datos ordenados. Si el número de elementos es par, la mediana es la media de los dos valores centrales. Si el número de elementos es impar, la mediana es el valor central.
+
+### Pruebas recomendadas
+
+- La puntuación mediana de los tableros es 0. Este resultado es esperable ya que en la mayoría de situaciones en una partida de ajedrez ninguno de los bandos tiene una ventaja clara hasta los últimos movimientos.
+- Casos límite. Los test unitarios deben servir para comprobar que los métodos evaluados funcionan correctamente en situaciones normales, pero también en situaciones límite. Al trabajar con una lista los casos límite son:
+    - Una lista vacía (no se ha definido que pasaría en este caso, pero se puede decidir que el método devuelva 0 o que lance una excepción)
+    - Una lista con un solo elemento
+    - Una lista con todos los elementos iguales
+    - Una lista con un número impar de elementos
+    - Una lista con un número par de elementos
+  
+## Pasos extra (opcionales)
+
+### Porcentaje de tableros desequilibrados
+
+Como se ha podido comprobar al implementar el método `getPuntuacionMediana`, la mayoría de tableros tiene una puntuación cercana a 0. Si este número cambia, significa que uno de los dos bandos tiene ventaja. Se propone implementar un método `getPorcentajeTablerosConVentaja(Bando bando)` que devuelva el porcentaje de tableros en los que el bando pasado como parámetro tiene ventaja. 
+
+### GestorPartidas
+
+Desarrollar una clase `GestorPartidas` que permita gestionar una colección de partidas. Esta clase debería hacer uso de la clase `GestorTableros` y sus métodos. Se propone implementar los métodos:
+    - `getPartidasConMayorPuntuacion()` que devuelve una lista con las partidas que contengan el tablero con la mayor puntuación observada.
+    - `getPartidasConPuntuacionMinima(int puntuacion)` que devuelve una lista con las partidas que contengan el tablero con una puntuación mayor o igual a la puntuación que se pasa como parámetro.
+
+
+
+
+
+
+
+
+# Laboratorio 1
+
+En este laboratorio continuaremos con el desarrollo de la clase `Tablero` y presentaremos la clase `GestorTableros`. La clase `GestorTableros` se encargará de gestionar una colección de tableros y de realizar operaciones sobre ellos:
+- Ordenar los tableros según su puntuación
+- Buscar tableros según su puntuación
+
+El código que se desarrollará en este laboratorio será utilizado en la práctica 1.
+
+En la clase `LectorPartidas`se ha añadido un método, `leerPartidasDeZip` para leer una colección de tableros a partir de un archivo comprimido. Este método funciona igual que el método `leerPartidas` que se utilizó en el laboratorio 0, pero en lugar de trabajar con un archivo de texto, trabaja con un archivo comprimido. Esto permitirá leer colecciones de tableros aún mayores. Los resultados que se indican en este enunciado se han obtenido utilizando el archivo `partidas_extendido.zip`.
+
+> [!WARNING]
+> Si el ordenador en el que se realiza el laboratorio tiene problemas para manejar el archivo `partidas_extendido.zip`, se podrá seguir utilizando `partidas.txt` como en el laboratorio 0.
+
+## Objetivos
+
+- Completar la implementación de la clase `Tablero`
+- Ordenar una colección de tableros
+- Buscar tableros según su puntuación
+
+## Paso 1: Constructor de la clase Tablero
+
+En el Laboratorio 0, se vio como se podía representar un tablero como un String de 64 caracteres. El primer objetivo de este laboratorio es crear un constructor para la clase Tablero que reciba como parámetro uno de esos Strings y guarde su información en una matriz de 8x8. La matriz se llamará `tablero` y será un atributo de la clase `Tablero`. El construtor que se debe completar ya está definido en la clase `Tablero` y su cabecera es `public Tablero(String tableroSerializado)`.
+
+Recordando el formato que ya se presentó en el Laboratorio 0, el String que se recibe como parámetro tiene 64 caracteres que representan las 64 casillas del tablero. Cada caracter representa una casilla y puede ser una pieza o un punto. Las piezas se representan con letras, mayúsculas en el caso del bando blanco y minúsculas en le caso del bando negro. La correspondencia entre las letras y las piezas que representan es la siguiente:
+
+<div style="margin-left: auto;
+            margin-right: auto;
+            width:30%">
+
+| Letra | Pieza |
+| ----- | ----- |
+| K | Rey |
+| Q | Reina |
+| R | Torre |
+| B | Alfil |
+| N | Caballo |
+| P | Peón |
+| . | Casilla vacía |
+
+</div>
+
+Para almacenar el tablero en el array bidimensional, consideraremos que la posición `[0][0]` es la casilla superior izquierda, orientando el tablero con las fichas blancas abajo. Es decir, en el tablero inicial de una partida que se representa con el String `"rnbqkbnrpppppppp................................PPPPPPPPRNBQKBNR"`, la primera fila del array contiene las piezas negras que no son peones `rnbqkbnr`. Para cada una de las posiciones que contenga una pieza se debe crear un objeto `Pieza` para representarla, las casillas vacías se dejarán como `null`;
+<div style="margin-left: auto;
+            margin-right: auto;
+            width:30%">
+
+![Tablero indexado](data/tablero_indices.png)
+
+</div>
+
+### Pruebas recomendadas
+
+- Crear un tablero vacío y recorrer el array comprobando que todas las posiciones son null (utilizar el constructor sin parámetros para crear el tablero vacío)
+- Crear un tablero con la posición inicial y comprobar que las piezas están en su sitio (utilizar el método `tableroBasico()` para crear el tablero inicial)
+- Crear un tablero con la siguiente distribución y comprobar que las piezas están en su sitio
+
+    ```"..........K................q..k....q..................b........."```
+
+    - `tablero[1][2]` es un rey blanco
+    - `tablero[3][3]` es una reina negra
+    - `tablero[3][6]` es un rey negro
+    - `tablero[4][3]` es una reina negra
+    - `tablero[6][6]` es un alfil negro
+
+## Paso 2: Método para evaluar un tablero
+
+El siguiente paso es diseñar un método que indique como de favorable es un tablero para uno de los bandos. Para ello se asignará una puntuación al tablero en función de las piezas que queden vivas del bando que se evalúa. Cada pieza tiene un valor en puntos según la siguiente tabla:
+<div style="margin-left: auto;
+            margin-right: auto;
+            width:30%">
+
+| Pieza | Puntos |
+| ----- | ------ |
+| Rey | 100 |
+| Reina | 9 |
+| Torre | 5 |
+| Alfil | 3 |
+| Caballo | 3 |
+| Peón | 1 |
+
+</div>
+
+Este método se llamará `getPuntuacionBando` y devolverá un entero con la puntuación del tablero. Recibirá como parámetro una variable de tipo `Bando` que indicará el bando que se quiere evaluar. El método debe recorrer el tablero y sumar los puntos de las piezas del bando que se quiere evaluar.
+
+### Pruebas recomendadas
+
+- Un tablero vacío tiene puntuación 0 para ambos bandos
+- Un tablero en la posición inicial tiene puntuación 139 para los dos bandos 
+- El siguiente tablero tiene puntuación 103 para el bando blanco y 127 para el bando negro
+
+    ```"....r...p....k...p.....p.......r..P.p.....Pp....P.....bK.....q.."```
+
+### Nota
+
+Esta forma de evaluar el valor de las piezas de ajedrez es bastante habitual y se conoce como [Valor relativo](https://es.wikipedia.org/wiki/Valor_relativo_de_las_piezas_de_ajedrez). Se usa muchas veces para medir el efecto de una jugada y por los programas de ajedrez.
+
+## Paso 3: Comparar tableros
+
+Java cuenta con una interfaz llamada `Comparable` que permite definir un método de comparación entre objetos. La interfaz `Comparable` tiene un único método llamado `compareTo` que recibe como parámetro un objeto del mismo tipo que el que implementa la interfaz y devuelve un entero. Este entero debe ser negativo si el objeto que llama al método es menor que el que se pasa como parámetro, 0 si son iguales y positivo si el objeto que llama al método es mayor que el que se pasa como parámetro.
+
+Se va a utilizar esta interfaz para poder comparar dos tableros en función de su puntuación. Para ello, la clase `Tablero` debe implementar la interfaz `Comparable` y sobreescribir el método `compareTo`. El método `getPuntuacionBando` que se ha desarrollado en el paso anterior devuelve la puntuación del tablero desde el punto de vista de uno de los bandos; para comparar tableros se utilizará una puntuación general que se calcule como la diferencia entre la puntuación de las blancas y la puntuación de las negras. El método `compareTo` debe utilizar esta puntuación general para comparar dos tableros y decidir cual es el mayor.
+
+El método `compareTo` debe devolver un entero positivo si el tablero que llama al método es mayor que el que se pasa como parámetro, 0 si son iguales y un entero negativo si el tablero que llama al método es peor que el que se pasa como parámetro.
+
+### Pruebas recomendadas
+
+- Dos tableros iguales deben devolver 0 al compararse
+- Un tablero vacío y el tablero básico deben devolver también 0 al compararse
+- El siguiente tablero debe ser mayor que el tablero básico
+
+    ```"r.b.k..r........p.N..bpp...P.p......pq..P.N.R..P.PP..PP.R..Q..K."```
+
+- El siguiente tablero debe ser menor que el tablero básico
+
+    ```"....rk.......pppp........r..b...............K..n........q......."```
+
+## Paso 4: Buscar tableros
+
+La clase `GestorTableros` es una clase que se encarga de gestionar una colección de tableros y de realizar operaciones sobre ellos. Hay que desarrollar dos métodos de esta clase:
+- `public Tablero mayorTablero()`: Este método devolverá el tablero con mayor puntuación.
+- `public List<Tablero> getTablerosConPuntuacionMinima(int puntuacion)`: Este método devolverá una lista de tableros que tengan al menos la puntuación indicada.
+
+### Pruebas recomendadas
+
+- El mayor tablero tiene una puntuación general de 70
+- Hay 6240 tableros con una puntuación general mayor de 25
+
+Si se usa el archivo partidas.txt
+- El mayor tablero tiene una puntuación general de 42
+- Hay 501 tableros con una puntuación general mayor de 25
+
+## Pasos extra (opcional)
+
+Los siguientes pasos son opcionales y no son necesarios para completar el laboratorio. Se proponen como ejercicios adicionales para aquellos que quieran profundizar en el desarrollo de la clase `Tablero`.
+
+### Comparación avanzada
+
+Si dos tableros tienen la misma puntuación, se puede comparar la posición de los peones más adelantados para decidir cual es el mejor. Para ello, se puede modificar el método `compareTo` para que en caso de empate, el tablero con un peón blanco más adelantado sea el que se considere como mayor.
+
+### Buscar tableros por puntuación
+
+En el paso 4 se ha desarrollado un método que devuelve una lista de tableros con una puntuación mínima. Se puede desarrollar otro método que reciba puntuaiones máxima y mínima y devuelva una lista de tableros con una puntuación entre esos dos valores.
+
+### Modificar el método `equals`
+
+El método `equals` se puede modificar para que compruebe si dos tableros son iguales solo si los arrays bidimensionales que representan los tableros son iguales.
