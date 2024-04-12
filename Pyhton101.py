@@ -41,7 +41,7 @@ print(b)
 
 name = "Michael Jackson"
 print(name.find('el'))      #nos dice en qué posición empieza el string que queremos buscar
-L = ["Micharl Jackson" ,3 , 69 ,(7,9,5), "MJ"] #Lista, se pueden cambiar los valores, añadir distintos elementos, concatenar
+L = ["Michael Jackson" ,3 , 69 ,(7,9,5), "MJ"] #Lista, se pueden cambiar los valores, añadir distintos elementos, concatenar
 print(L)
 print(L[3])
 print(L[0:3])
